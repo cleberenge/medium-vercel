@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     console.log("POST /api/posts: Inserindo dados no Supabase.")
     const { data, error } = await supabase
-      .from("posts")
+      .from("create_posts_table") // alterado de "posts" para "create_posts_table"
       .insert([
         {
           title,
@@ -108,7 +108,10 @@ export async function GET(request: NextRequest) {
 
   try {
     console.log("GET /api/posts: Buscando posts no Supabase.")
-    const { data: posts, error } = await supabase.from("posts").select("*").order("created_at", { ascending: false })
+    const { data: posts, error } = await supabase
+      .from("create_posts_table")
+      .select("*")
+      .order("created_at", { ascending: false }) // alterado de "posts" para "create_posts_table"
 
     if (error) {
       console.error("GET /api/posts: Erro ao buscar posts:", error)
@@ -159,7 +162,7 @@ export async function PUT(request: NextRequest) {
 
     // Buscar post atual
     const { data: currentPost, error: fetchError } = await supabase
-      .from("posts")
+      .from("create_posts_table") // alterado de "posts" para "create_posts_table"
       .select("image_url")
       .eq("id", id)
       .single()
@@ -183,7 +186,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const { error } = await supabase
-      .from("posts")
+      .from("create_posts_table") // alterado de "posts" para "create_posts_table"
       .update({
         title,
         description,
@@ -230,7 +233,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ success: false, message: "ID do post é obrigatório." }, { status: 400 })
     }
 
-    const { error } = await supabase.from("posts").delete().eq("id", id)
+    const { error } = await supabase.from("create_posts_table").delete().eq("id", id) // alterado de "posts" para "create_posts_table"
 
     if (error) {
       console.error("DELETE /api/posts: Erro ao deletar:", error)
