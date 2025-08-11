@@ -1,0 +1,73 @@
+// app/contact/page.tsx
+import SiteHeader from "@/components/site-header"
+import SiteFooter from "@/components/site-footer"
+import ContactForm from "./ContactForm"
+
+export const metadata = {
+title: "Contato",
+description: "Entre em contato conosco.",
+}
+
+export default function Page() {
+return (
+  <div className="min-h-screen flex flex-col bg-white">
+    <SiteHeader />
+    <main className="mx-auto max-w-2xl px-4 py-10 md:py-14">
+      <h1 className="text-2xl md:text-3xl font-bold">Contato</h1>
+      <p className="text-muted-foreground mt-1">
+        Preencha o formulário e clique em Enviar. Você será redirecionado ao seu e-mail.
+      </p>
+
+      <ContactForm />
+    </main>
+    <SiteFooter />
+  </div>
+)
+}
+
+// app/page.tsx
+import Hero from "@/components/hero"
+import PostCard from "@/components/post-card"
+import { getPosts } from "@/lib/posts"
+
+export default async function HomePage() {
+const posts = await getPosts()
+
+return (
+  <div className="min-h-screen flex flex-col bg-white">
+    <Hero coverImage="/hero-image.jpg" />
+    <div className="mx-auto max-w-2xl px-4 py-10 md:py-14">
+      {posts.map((post) => (
+        <PostCard
+          key={post.slug}
+          title={post.title}
+          coverImage={post.coverImage || "/placeholder.svg?height=240&width=400"}
+          excerpt={post.excerpt}
+          slug={post.slug}
+        />
+      ))}
+    </div>
+  </div>
+)
+}
+
+// app/blog/[slug]/page.tsx
+import { getPostBySlug } from "@/lib/posts"
+import PostHero from "@/components/post-hero"
+import PostContent from "@/components/post-content"
+
+export default async function BlogPostPage({ params }) {
+const post = await getPostBySlug(params.slug)
+
+return (
+  <div className="min-h-screen flex flex-col bg-white">
+    <PostHero
+      title={post.title}
+      coverImage={post.coverImage || "/placeholder.svg?height=405&width=720"}
+    />
+    <div className="mx-auto max-w-2xl px-4 py-10 md:py-14">
+      <PostContent content={post.content} />
+    </div>
+  </div>
+)
+}
