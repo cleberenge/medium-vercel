@@ -4,11 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 
-type LoginButtonProps = {
-  onLoginSuccess: () => void
-}
-
-export default function LoginButton({ onLoginSuccess }: LoginButtonProps) {
+export default function LoginButton() {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")

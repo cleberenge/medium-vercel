@@ -13,7 +13,7 @@ type DashboardClientProps = {
   isDbConnected: boolean
   isBlobConnected: boolean
   adminPass: string
-  onLogout: () => Promise<void> // Adiciona prop para a função de logout
+  onLogout: () => Promise<void>
 }
 
 export default function DashboardClient({ isDbConnected, isBlobConnected, adminPass, onLogout }: DashboardClientProps) {
@@ -25,10 +25,10 @@ export default function DashboardClient({ isDbConnected, isBlobConnected, adminP
 
   useEffect(() => {
     fetchPosts()
-  }, [view]) // Recarrega posts quando a view muda para dashboard
+  }, [view])
 
   const fetchPosts = async () => {
-    if (view !== "dashboard") return // Só busca se estiver na view de dashboard
+    if (view !== "dashboard") return
     try {
       const res = await fetch("/api/posts", {
         headers: {
@@ -37,15 +37,12 @@ export default function DashboardClient({ isDbConnected, isBlobConnected, adminP
       })
       const data = await res.json()
       if (data.success) {
-        console.log("Posts carregados:", data.posts)
         setPosts(data.posts)
       } else {
-        console.error("Erro ao buscar posts:", data.message)
-        setMessage(`Erro ao carregar posts: ${data.message}. Verifique os logs do Vercel.`)
+        setMessage(`❌ Erro ao carregar posts: ${data.message}`)
       }
     } catch (err) {
-      console.error("Erro de rede ao buscar posts:", err)
-      setMessage("Erro de rede ao carregar posts. Tente recarregar a página.")
+      setMessage("❌ Erro de rede ao carregar posts")
     }
   }
 
@@ -66,26 +63,21 @@ export default function DashboardClient({ isDbConnected, isBlobConnected, adminP
       })
       const data = await res.json()
 
-      console.log("API Response Status:", res.status)
-      console.log("API Response Data:", data)
-
       if (data.success) {
         setMessage("✅ Post criado com sucesso!")
         e.currentTarget.reset()
         setCoverPreview(null)
-        setView("dashboard") // Volta para o dashboard após criar
+        setView("dashboard")
       } else {
         setMessage(`❌ Erro ao criar post: ${data.message || "Erro desconhecido"}`)
       }
     } catch (err) {
-      console.error("Erro de rede ao criar post:", err)
-      setMessage("❌ Erro de rede ao criar post. Verifique sua conexão.")
+      setMessage("❌ Erro de rede ao criar post")
     } finally {
       setSubmitting(false)
     }
   }
 
-  // Tela Principal do Dashboard
   if (view === "dashboard") {
     return (
       <div className="min-h-screen bg-white">
@@ -94,10 +86,7 @@ export default function DashboardClient({ isDbConnected, isBlobConnected, adminP
             <h1 className="font-semibold">Dashboard</h1>
             <div className="flex items-center gap-4">
               <Button onClick={() => setView("create")}>Criar Post</Button>
-              <button
-                onClick={onLogout} // Chama a Server Action de logout
-                className="text-sm underline text-muted-foreground"
-              >
+              <button onClick={onLogout} className="text-sm underline text-muted-foreground">
                 Sair
               </button>
             </div>
@@ -131,6 +120,17 @@ export default function DashboardClient({ isDbConnected, isBlobConnected, adminP
               </div>
             </div>
 
+            {message && (
+              <div
+                className={cn(
+                  "text-sm p-3 rounded",
+                  message.includes("✅") ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700",
+                )}
+              >
+                {message}
+              </div>
+            )}
+
             <h3 className="text-xl font-semibold mt-8">Posts Existentes</h3>
             {posts.length === 0 ? (
               <p className="text-sm text-muted-foreground">Nenhum post encontrado. Crie um novo!</p>
@@ -147,9 +147,7 @@ export default function DashboardClient({ isDbConnected, isBlobConnected, adminP
                     </div>
                     <div className="flex gap-2">
                       <Button asChild variant="secondary" size="sm">
-                        <Link href={`/blog/${p.slug}`} prefetch>
-                          Ver
-                        </Link>
+                        <Link href={`/blog/${p.slug}`}>Ver</Link>
                       </Button>
                     </div>
                   </li>
@@ -162,7 +160,6 @@ export default function DashboardClient({ isDbConnected, isBlobConnected, adminP
     )
   }
 
-  // Tela de Criar Post
   if (view === "create") {
     return (
       <div className="min-h-screen bg-white">
@@ -247,7 +244,6 @@ Conteúdo do post..."
               />
               {coverPreview && (
                 <div className="relative aspect-[16/9] w-full overflow-hidden border">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={coverPreview || "/placeholder.svg"}
                     alt="Pré-visualização da capa"
@@ -262,7 +258,7 @@ Conteúdo do post..."
                 <label htmlFor="status" className="text-sm font-medium">
                   Status
                 </label>
-                <select id="status" name="status" className="h-10 border rounded-md px-3">
+                <select id="status" name="status" className="h-10 border rounded-md px-3 w-full">
                   <option value="draft">Rascunho</option>
                   <option value="published">Publicado</option>
                   <option value="scheduled">Agendado</option>
